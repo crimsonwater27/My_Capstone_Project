@@ -1,11 +1,10 @@
 import { useEffect } from "react";
 import { useArtStore } from "../store/useArtStore";
 import ArtworkCard from "../components/ArtworkCard";
-import Timeline from "../components/Timeline";
 import TimelineSlider from "../components/TimelineSlider";
 
 export default function Dashboard() {
-  const { artworks, fetchArtworks } = useArtStore();
+  const { filteredArtworks, fetchArtworks } = useArtStore();
 
   useEffect(() => {
     fetchArtworks();
@@ -18,7 +17,7 @@ export default function Dashboard() {
       <TimelineSlider />
 
       <div>
-        {artworks.map((art) => (
+        {filteredArtworks.map((art) => (
           <ArtworkCard key={art.objectID} art={art} />
         ))}
       </div>
