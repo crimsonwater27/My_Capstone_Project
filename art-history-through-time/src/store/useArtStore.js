@@ -7,6 +7,8 @@ export const useArtStore = create((set) => ({
   selectedArtwork: null,
   yearRange: [1400, 1800],
 
+  setYearRange: (range) => set({ yearRange: range }),
+
   fetchArtworks: async () => {
     const ids = await searchArtworks("art");
     const data = await Promise.all(ids.map(id => getArtwork(id)));
