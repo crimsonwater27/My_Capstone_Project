@@ -1,25 +1,22 @@
 import { create } from "zustand";
+import { searchArtworks, getArtwork } from "../services/museumApi";
 
-const useArtStore = create((set) => ({
+export const useArtStore = create((set) => ({
   artworks: [],
   favorites: [],
-  startYear: 1400,
-  endYear: 1600,
+  selectedArtwork: null,
+  yearRange: [1400, 1800],
 
-  setArtworks: (artworks) => set({ artworks }),
+  fetchArtworks: async () => {
+    const ids = await searchArtworks("art");
+    const data = await Promise.all(ids.map(id => getArtwork(id)));
+    set({ artworks: data });
+  },
 
-  setTimeline: (startYear, endYear) =>
-    set({ startYear, endYear }),
+  selectArtwork: (art) => set({ selectedArtwork: art }),
 
   addFavorite: (art) =>
     set((state) => ({
       favorites: [...state.favorites, art],
     })),
-
-  removeFavorite: (id) =>
-    set((state) => ({
-      favorites: state.favorites.filter((a) => a.id !== id),
-    })),
 }));
-
-export default useArtStore;
