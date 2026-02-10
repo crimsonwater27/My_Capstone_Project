@@ -1,8 +1,8 @@
 import {Link} from "react-router-dom";
-import {usestore} from "../store/useArtStore";
+import {useArtStore} from "../store/useArtStore";
 
 export default function ArtworkCard({ art}) {
-    const { addFavorite } = usestore();
+    const { addFavorite } = useArtStore();
 
     return (
         <div>
