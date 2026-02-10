@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Favorites from "./pages/Favorites";
 import ArtworkDetail from "./pages/ArtworkDetail";
@@ -8,7 +8,7 @@ import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
-    <BrowserRouter>
+    <>
       <Header />
       <main className="min-h-screen">
         <Routes>
@@ -19,7 +19,7 @@ function App() {
         </Routes>
       </main>
       <Footer />
-    </BrowserRouter>
+    </>
   );
 }
 
