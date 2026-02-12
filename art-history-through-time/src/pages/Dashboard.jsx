@@ -21,15 +21,16 @@ export default function Dashboard() {
       <SearchBar />
       <Filters />
       <FavoritesPanel />
+      <TimelineSlider />
 
+      <h1>Artwork Images</h1>
       <ArtworkGrid />
 
       {selectedArtwork && <ArtworkModal />}
 
 
-      <h1>Art History Through Time</h1>
+      
 
-      <TimelineSlider />
-      </div>
+    </div>
   );
 }
