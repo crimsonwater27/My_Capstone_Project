@@ -2,25 +2,34 @@ import { useEffect } from "react";
 import { useArtStore } from "../store/useArtStore";
 import ArtworkCard from "../components/ArtworkCard";
 import TimelineSlider from "../components/TimelineSlider";
+import SearchBar from "../components/SearchBar";
+import Filters from "../components/Filters";
+import ArtworkGrid from "../components/ArtworkGrid";
+import ArtworkModal from "../components/ArtworkModal";
+import FavoritesPanel from "../components/FavoritesPanel";
 
 export default function Dashboard() {
-  const { filteredArtworks, fetchArtworks } = useArtStore();
+  const fetchArtworks = useArtStore((s) => s.fetchArtworks);
+  const selectedArtwork = useArtStore((s) => s.selectedArtwork);
 
   useEffect(() => {
-    fetchArtworks();
+    fetchArtworks("painting");
   }, [fetchArtworks]);
 
   return (
     <div>
+      <SearchBar />
+      <Filters />
+      <FavoritesPanel />
+
+      <ArtworkGrid />
+
+      {selectedArtwork && <ArtworkModal />}
+
+
       <h1>Art History Through Time</h1>
 
       <TimelineSlider />
-
-      <div>
-        {filteredArtworks.map((art) => (
-          <ArtworkCard key={art.objectID} art={art} />
-        ))}
       </div>
-    </div>
   );
 }

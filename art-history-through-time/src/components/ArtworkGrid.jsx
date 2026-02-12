@@ -1,16 +1,18 @@
 import React from "react";
+import { useArtStore } from "../store/useArtStore";
+import ArtworkCard from "./ArtworkCard";
 
-const ArtworkGrid = ({ artworks, onSelect }) => {
+
+export default function ArtworkGrid() {
+  const artworks = useArtStore((s) => s.filteredArtworks);
+
+  if (!artworks.length) return <p>No results</p>;
+
   return (
     <div>
       {artworks.map((art) => (
-        <div key={art.id} onClick={() => onSelect(art)}>
-          <img src={art.image} alt={art.title} width="150" />
-          <p>{art.title}</p>
-        </div>
+        <ArtworkCard key={art.id} artwork={art} />
       ))}
     </div>
   );
-};
-
-export default ArtworkGrid;
+}

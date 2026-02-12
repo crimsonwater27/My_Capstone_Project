@@ -1,24 +1,26 @@
 import React, { useState } from "react";
+import { useArtStore } from "../store/useArtStore";
 
-const SearchBar = ({ onSearch }) => {
+
+export default function SearchBar() {
   const [query, setQuery] = useState("");
+  const fetchArtworks = useArtStore((s) => s.fetchArtworks);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSearch(query);
+  const handleSearch = () => {
+    fetchArtworks(query);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <div>
       <input
         type="text"
-        placeholder="Search artworks..."
+        placeholder="Search art, artist, era..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
-      <button type="submit">Search</button>
-    </form>
+
+      <button onClick={handleSearch}>Search</button>
+    </div>
   );
 };
 
-export default SearchBar;
