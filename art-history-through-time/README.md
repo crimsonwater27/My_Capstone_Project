@@ -1,16 +1,43 @@
-# React + Vite
+# Art History Through Time
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Overview
 
-Currently, two official plugins are available:
+Art History Through Time is an interactive web application that allows users to explore artworks across historical periods using real museum data. Users can browse artworks, view details, and save favorites.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+* Browse artworks from museum APIs
+* View artwork details
+* Timeline-based exploration
+* Save favorite artworks
+* Responsive UI (coming soon)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+* React (Vite)
+* Zustand (state management)
+* React Router
+* Axios
+* Tailwind (styling phase)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Setup
+
+```bash
+git clone <repo>
+cd art-history-through-time
+npm install
+npm run dev
+```
+
+## API
+
+This project uses:
+
+* The Metropolitan Museum of Art Collection API
+
+## Future Improvements
+
+* Timeline filtering
+* Search by era
+* Responsive mobile UI
+* Animations
