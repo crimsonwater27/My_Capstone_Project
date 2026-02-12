@@ -1,17 +1,21 @@
-import React from "react";
+import { useArtStore } from "../store/useArtStore";
 
-const Filters = ({ onFilterChange }) => {
+export default function Filters() {
+  const setYearRange = useArtStore((s) => s.setYearRange);
+
   return (
     <div>
-      <select onChange={(e) => onFilterChange(e.target.value)}>
-        <option value="">All Eras</option>
-        <option value="baroque">Baroque</option>
-        <option value="renaissance">Renaissance</option>
-        <option value="modern">Modern</option>
-        <option value="romanticism">Romanticism</option>
-      </select>
+      <button onClick={() => setYearRange([1400, 1600])}>
+        Renaissance
+      </button>
+
+      <button onClick={() => setYearRange([1600, 1800])}>
+        Baroque
+      </button>
+
+      <button onClick={() => setYearRange([1800, 2000])}>
+        Modern
+      </button>
     </div>
   );
-};
-
-export default Filters;
+}

@@ -1,13 +1,13 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getArtwork } from "../services/museumApi";
+import { searchArtworks } from "../services/metMuseumApi";
 
 export default function ArtworkDetail() {
   const { id } = useParams();
   const [art, setArt] = useState(null);
 
   useEffect(() => {
-    getArtwork(id).then(setArt);
+    searchArtworks(id).then(setArt);
   }, [id]);
 
   if (!art) return <p>Loading...</p>;

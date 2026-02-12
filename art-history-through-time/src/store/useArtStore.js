@@ -7,7 +7,10 @@ export const useArtStore = create((set, get) => ({
   filteredArtworks: [],
   favorites: [],
   selectedArtwork: null,
-  yearRange: [1400, 1800],
+  yearRange: [1400, 2000],
+  loading: false,
+
+  setSelectedArtwork: (art) => set({ selectedArtwork: art }),
 
   setYearRange: (range) => {
     set({ yearRange: range });
@@ -15,18 +18,17 @@ export const useArtStore = create((set, get) => ({
   },
 
   fetchArtworks: async (query = "painting") => {
-    try {
-      const data = await searchArtworks(query);
+    set({ loading: true });
 
-      set({
-        artworks: data,
-        filteredArtworks: data,
-      });
+    const data = await searchArtworks(query);
 
-      get().applyFilters();
-    } catch (err) {
-      console.error("Fetch artworks failed:", err);
-    }
+    set({
+      artworks: data,
+      filteredArtworks: data,
+      loading: false,
+    });
+
+    get().applyFilters();
   },
 
   applyFilters: () => {
@@ -34,7 +36,7 @@ export const useArtStore = create((set, get) => ({
 
     const filtered = artworks.filter((art) => {
       const year = parseYear(art.date);
-      if (!year) return false;
+      if (!year) return true;
 
       return year >= yearRange[0] && year <= yearRange[1];
     });
@@ -44,15 +46,6 @@ export const useArtStore = create((set, get) => ({
 
   addFavorite: (art) =>
     set((state) => ({
-      favorites: state.favorites.find((f) => f.id === art.id)
-        ? state.favorites
-        : [...state.favorites, art],
+      favorites: [...state.favorites, art],
     })),
-
-  removeFavorite: (id) =>
-    set((state) => ({
-      favorites: state.favorites.filter((f) => f.id !== id),
-    })),
-
-  setSelectedArtwork: (art) => set({ selectedArtwork: art }),
 }));
