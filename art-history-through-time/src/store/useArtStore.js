@@ -6,7 +6,7 @@ import { parseYear } from "../utils/parseYear";
 export const useArtStore = create((set, get) => ({
   artworks: [],
   filteredArtworks: [],
-  favorites: [],
+  favorites: JSON.parse(localStorage.getItem("favorites")) || [],
   selectedArtwork: null,
   wikiData: null,
 
@@ -21,21 +21,24 @@ export const useArtStore = create((set, get) => ({
     get().filterArtworks();
   },
 
-  fetchArtworks: async () => {
+  fetchArtworks: async (query = "painting") => {
     try {
       set({ loading: true, error: null });
 
-      const ids = await searchArtworks("painting");
+      const ids = await searchArtworks(query);
       const limited = ids.slice(0, 30);
 
-      const data = await Promise.all(limited.map(id => getArtwork(id)));
+      const data = await Promise.all(
+        limited.map((id) => getArtwork(id))
+      );
 
-      set({
-        artworks: data,
-        filteredArtworks: data,
-        loading: false,
-      });
-    } catch {
+      const clean = data.filter(Boolean);
+
+      set({ artworks: clean, loading: false });
+
+      get().filterArtworks();
+    } catch (err) {
+      console.error(err);
       set({ error: "Failed to fetch artworks", loading: false });
     }
   },
@@ -44,8 +47,9 @@ export const useArtStore = create((set, get) => ({
     const { artworks, yearRange } = get();
 
     const filtered = artworks.filter((art) => {
-      const year = parseYear(art.ObjectDate);
-      if (!year) return false;
+      const year = parseYear(art?.objectDate);
+      if (!year) return true;
+
       return year >= yearRange[0] && year <= yearRange[1];
     });
 
@@ -53,34 +57,48 @@ export const useArtStore = create((set, get) => ({
   },
 
   selectArtwork: async (art) => {
-    set({ selectedArtwork: art, modalLoading: true, wikiData: null });
+    set({
+      selectedArtwork: art,
+      modalLoading: true,
+      wikiData: null,
+    });
 
     if (!art?.artistDisplayName) {
       set({ modalLoading: false });
       return;
     }
 
-    const wiki = await getWikiSummary(art.artistDisplayName);
+    try {
+      const wiki = await getWikiSummary(art.artistDisplayName);
 
-    set({
-      wikiData: wiki,
-      modalLoading: false,
-    });
+      set({
+        wikiData: wiki,
+        modalLoading: false,
+      });
+    } catch {
+      set({ modalLoading: false });
+    }
   },
 
-  closeModal: () => set({ selectedArtwork: null, wikiData: null }),
+  closeModal: () =>
+    set({
+      selectedArtwork: null,
+      wikiData: null,
+    }),
 
-removeFavorite: (id) => {
-  const updated = get().favorites.filter((art) => art.objectID !== id);
-  localStorage.setItem("favorites", JSON.stringify(updated));
-  return set({ favorites: updated });
-},
+  addFavorite: (art) =>
+    set((state) => {
+      const updated = [...state.favorites, art];
+      localStorage.setItem("favorites", JSON.stringify(updated));
+      return { favorites: updated };
+    }),
 
-addFavorite: (art) =>
-  set((state) => {
-    const updated = [...state.favorites, art];
-    localStorage.setItem("favorites", JSON.stringify(updated));
-    return { favorites: updated };
-  }),
-
+  removeFavorite: (id) =>
+    set((state) => {
+      const updated = state.favorites.filter(
+        (art) => art.objectID !== id
+      );
+      localStorage.setItem("favorites", JSON.stringify(updated));
+      return { favorites: updated };
+    }),
 }));

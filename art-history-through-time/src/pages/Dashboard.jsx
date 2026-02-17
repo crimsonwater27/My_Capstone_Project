@@ -7,11 +7,27 @@ import SearchBar from "../components/SearchBar";
 import Filters from "../components/Filters";
 import ArtworkModal from "../components/ArtworkModal";
 import FavoritesPanel from "../components/FavoritesPanel";
+import Loader from "../components/Loader";
+
 
 export default function Dashboard() {
   const fetchArtworks = useArtStore((s) => s.fetchArtworks);
   const artworks = useArtStore((s) => s.filteredArtworks);
   const selectedArtwork = useArtStore((s) => s.selectedArtwork);
+
+  const loading = useArtStore((s) => s.loading);
+
+<div className="lg:col-span-3 space-y-6">
+  <h1 className="text-xl md:text-2xl font-bold">Artwork Images</h1>
+
+  {loading ? <Loader /> : <ArtworkGrid artworks={artworks} />}
+</div>
+
+  
+{!loading && artworks.length === 0 && (
+  <p className="text-gray-500">No artworks found.</p>
+)}
+
 
   useEffect(() => {
     fetchArtworks("painting");
