@@ -1,11 +1,9 @@
-import React from "react";
-
-const Footer = () => {
+export default function Footer() {
   return (
-    <footer>
-      <p>© {new Date().getFullYear()} Art History Through Time</p>
+    <footer className="border-t bg-white mt-10">
+      <div className="max-w-7xl mx-auto px-4 py-6 text-center text-sm text-gray-500">
+        © 2026 Art History Through Time
+      </div>
     </footer>
   );
-};
-
-export default Footer;
+}
