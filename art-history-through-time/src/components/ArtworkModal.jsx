@@ -1,31 +1,39 @@
 import { useArtStore } from "../store/useArtStore";
+import Loader from "./Loader";
 
 export default function ArtworkModal() {
-  const art = useArtStore ((s) => s.selectedArtwork);
-  const close = useArtStore((s) => s.setSelectedArtwork);
+  const { selectedArtwork, closeModal, wikiData, modalLoading } = useArtStore();
 
-  if (!art) return null;
+  if (!selectedArtwork) return null;
 
   return (
-    <div>
-      <button onClick={() => close (null)}>Close</button>
-      
-      <h2>{art.title}</h2>
-      <img src={art.primaryImageSmall} alt={art.title} width="300" />
-      <p>{art.artistDisplayName}</p>
-      <p>{art.date}</p>
+    <div className="fixed inset-0 bg-black/60 flex justify-center items-center">
+      <div className="bg-white p-6 max-w-lg w-full relative">
+        <button onClick={closeModal} className="absolute top-2 right-2">
+          ✕
+        </button>
 
-      <h3>About</h3>
-      <p>{art.wiki?.extract}</p>
+        <img
+          src={selectedArtwork.primaryImageSmall}
+          alt={selectedArtwork.title}
+          className="w-full mb-4"
+        />
 
-      {art.wiki?.wikiUrl &&(
-        <a href={art.wiki.wikiUrl} target="_blank">
-          Read more
-        </a>
-      )}
+        <h2 className="text-xl font-bold">{selectedArtwork.title}</h2>
+        <p>{selectedArtwork.artistDisplayName}</p>
+        <p>{selectedArtwork.objectDate}</p>
 
+        {modalLoading && <Loader />}
+
+        {wikiData && (
+          <div className="mt-4 text-sm">
+            <p>{wikiData.extract}</p>
+            <a href={wikiData.url} target="_blank">
+              Read more on Wikipedia
+            </a>
+          </div>
+        )}
+      </div>
     </div>
   );
-};
-
-
+}

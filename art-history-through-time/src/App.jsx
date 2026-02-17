@@ -10,7 +10,8 @@ function App() {
   return (
     <>
       <Header />
-      <main className="min-h-screen">
+
+      <main className="min-h-screen max-w-7xl mx-auto px-4">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/favorites" element={<Favorites />} />
@@ -18,6 +19,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
       </main>
+
       <Footer />
     </>
   );

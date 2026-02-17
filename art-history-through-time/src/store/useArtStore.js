@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { searchArtworks } from "../services/metMuseumApi";
+import { searchArtworks, getArtwork } from "../services/metMuseumApi";
+import { getWikiSummary } from "../services/wikiApi";
 import { parseYear } from "../utils/parseYear";
 
 export const useArtStore = create((set, get) => ({
@@ -7,45 +8,79 @@ export const useArtStore = create((set, get) => ({
   filteredArtworks: [],
   favorites: [],
   selectedArtwork: null,
-  yearRange: [1400, 2000],
-  loading: false,
+  wikiData: null,
 
-  setSelectedArtwork: (art) => set({ selectedArtwork: art }),
+  loading: false,
+  modalLoading: false,
+  error: null,
+
+  yearRange: [1400, 1800],
 
   setYearRange: (range) => {
     set({ yearRange: range });
-    get().applyFilters();
+    get().filterArtworks();
   },
 
-  fetchArtworks: async (query = "painting") => {
-    set({ loading: true });
+  fetchArtworks: async () => {
+    try {
+      set({ loading: true, error: null });
 
-    const data = await searchArtworks(query);
+      const ids = await searchArtworks("painting");
+      const limited = ids.slice(0, 30);
 
-    set({
-      artworks: data,
-      filteredArtworks: data,
-      loading: false,
-    });
+      const data = await Promise.all(limited.map(id => getArtwork(id)));
 
-    get().applyFilters();
+      set({
+        artworks: data,
+        filteredArtworks: data,
+        loading: false,
+      });
+    } catch {
+      set({ error: "Failed to fetch artworks", loading: false });
+    }
   },
 
-  applyFilters: () => {
+  filterArtworks: () => {
     const { artworks, yearRange } = get();
 
     const filtered = artworks.filter((art) => {
-      const year = parseYear(art.date);
-      if (!year) return true;
-
+      const year = parseYear(art.ObjectDate);
+      if (!year) return false;
       return year >= yearRange[0] && year <= yearRange[1];
     });
 
     set({ filteredArtworks: filtered });
   },
 
-  addFavorite: (art) =>
-    set((state) => ({
-      favorites: [...state.favorites, art],
-    })),
+  selectArtwork: async (art) => {
+    set({ selectedArtwork: art, modalLoading: true, wikiData: null });
+
+    if (!art?.artistDisplayName) {
+      set({ modalLoading: false });
+      return;
+    }
+
+    const wiki = await getWikiSummary(art.artistDisplayName);
+
+    set({
+      wikiData: wiki,
+      modalLoading: false,
+    });
+  },
+
+  closeModal: () => set({ selectedArtwork: null, wikiData: null }),
+
+removeFavorite: (id) => {
+  const updated = get().favorites.filter((art) => art.objectID !== id);
+  localStorage.setItem("favorites", JSON.stringify(updated));
+  return set({ favorites: updated });
+},
+
+addFavorite: (art) =>
+  set((state) => {
+    const updated = [...state.favorites, art];
+    localStorage.setItem("favorites", JSON.stringify(updated));
+    return { favorites: updated };
+  }),
+
 }));
