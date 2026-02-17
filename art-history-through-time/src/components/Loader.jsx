@@ -1,7 +1,7 @@
-import React from "react";
-
-const Loader = () => {
-  return <p>Loading...</p>;
-};
-
-export default Loader;
+export default function Loader() {
+  return (
+    <div className="flex justify-center items-center py-10">
+      <p className="text-lg animate-pulse">Loading artworks...</p>
+    </div>
+  );
+}

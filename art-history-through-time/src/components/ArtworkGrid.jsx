@@ -1,24 +1,24 @@
 import { useEffect } from "react";
-import { useArtStore } from "../store/useArtStore";
 import ArtworkCard from "./ArtworkCard";
+import Loader from "./Loader";
+import ErrorMessage from "./ErrorMessage";  
+import { useArtStore } from "../store/artStore";
 
-export default function ArtworkGrid() {
-  const fetchArtworks = useArtStore((s) => s.fetchArtworks);
-  const artworks = useArtStore((s) => s.filteredArtworks);
-  const loading = useArtStore((s) => s.loading);
+export const ArtworkGrid = () => {
+  const { filteredArtworks, loading, error, fetchArtworks } = useArtStore();
 
   useEffect(() => {
-    fetchArtworks("painting");
+    fetchArtworks();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
-  if (!artworks.length) return <p>No results</p>;
+  if (loading) return <Loader />;
+  if (error) return <ErrorMessage message={error} />;
 
   return (
-    <div>
-      {artworks.map((art) => (
-        <ArtworkCard key={art.id} art={art} />
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4">
+      {filteredArtworks.map((art) => (
+        <ArtworkCard key={art.objectID} art={art} />
       ))}
     </div>
   );
-}
+};
