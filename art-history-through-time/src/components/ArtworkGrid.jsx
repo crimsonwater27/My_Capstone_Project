@@ -9,7 +9,7 @@ export const ArtworkGrid = () => {
 
   useEffect(() => {
     fetchArtworks();
-  }, []);
+  }, [fetchArtworks]);
 
   if (loading) return <Loader />;
   if (error) return <ErrorMessage message={error} />;
