@@ -17,7 +17,7 @@ export default function Dashboard() {
 
   const loading = useArtStore((s) => s.loading);
 
-<div className="lg:col-span-3 space-y-6">
+<div className="lg:col-span-3 space-y-6 px-4 sm:px-6 lg:px-8 py-6">
   <h1 className="text-xl md:text-2xl font-bold">Artwork Images</h1>
 
   {loading ? <Loader /> : <ArtworkGrid artworks={artworks} />}
@@ -25,7 +25,7 @@ export default function Dashboard() {
 
   
 {!loading && artworks.length === 0 && (
-  <p className="text-gray-500">No artworks found.</p>
+  <p className="text-gray-500">Loading Artworks.</p>
 )}
 
 
@@ -42,7 +42,7 @@ export default function Dashboard() {
     <TimelineSlider />
   </div>
 
-  <div className="grid lg:grid-cols-4 gap-6">
+  <div className="grid lg:grid-cols-4 gap-6 items-start justify-center px-4 sm:px-6 lg:px-8 py-6">
 
     {/* Main */}
     <div className="lg:col-span-3 space-y-6">
@@ -50,7 +50,7 @@ export default function Dashboard() {
         Artwork Images
       </h1>
 
-      <ArtworkGrid artworks={artworks} />
+      {loading ? <Loader /> : <ArtworkGrid artworks={artworks} />}
     </div>
 
     {/* Sidebar */}
