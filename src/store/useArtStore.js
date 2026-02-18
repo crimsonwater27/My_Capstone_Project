@@ -90,7 +90,7 @@ export const useArtStore = create((set, get) => ({
     }
 
     try {
-      // 3️⃣ Clean artist name for Wikipedia
+      
       const safeName = encodeURIComponent(art.artist.replace(/["']/g, ""));
       const wiki = await fetchWikiSummary(safeName);
 
