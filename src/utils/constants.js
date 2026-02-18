@@ -1,0 +1,6 @@
+export const TIMELINE = {
+  MIN_YEAR: 1200,
+  MAX_YEAR: 2020,
+  DEFAULT_START: 1400,
+  DEFAULT_END: 1600,
+};
