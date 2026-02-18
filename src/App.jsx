@@ -5,10 +5,11 @@ import ArtworkDetail from "./pages/ArtworkDetail";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Dashboard from "./pages/Dashboard";
+import ArtworkModal from "./components/ArtworkModal";
 
 function App() {
   return (
-    <div className="flex flex-col min-h-screen bg-neutral-50">
+    <div className="flex flex-col min-h-screen bg-121212 text-white">
       <Header />
 
       <main className="flex-1 w-full">
@@ -18,6 +19,7 @@ function App() {
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/artwork/:id" element={<ArtworkDetail />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/modal" element={<ArtworkModal />} />
         </Routes>
         </div>
       </main>

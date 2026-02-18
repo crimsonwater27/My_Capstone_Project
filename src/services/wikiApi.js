@@ -1,26 +1,24 @@
-import axios from "axios";
+export const fetchWikiSummary = async (query) => {
+  if (!query) return null;
 
-const WIKI_BASE = "https://en.wikipedia.org/api/rest_v1/page/summary";
-
-/**
- * Get wikipedia summary for a term
- * @param {string} term
- */
-export const fetchWikiSummary = async (term) => {
   try {
-    if (!term) return null;
+    // encode query to handle spaces and special chars
+    const encoded = encodeURIComponent(query);
+    const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encoded}`;
 
-    const res = await axios.get(`${WIKI_BASE}/${encodeURIComponent(term)}`);
+    const res = await fetch(url);
 
-    return {
-      title: res.data.title,
-      description: res.data.description,
-      extract: res.data.extract,
-      image: res.data.thumbnail?.source || null,
-      wikiUrl: res.data.content_urls?.desktop?.page || null,
-    };
-  } catch {
-    console.log("Wiki fetch failed:", term);
+    if (!res.ok) {
+      console.warn(`Wiki fetch failed for: ${query}`);
+      return null;
+    }
+
+    const data = await res.json();
+
+    // return extract (summary) or null
+    return data.extract || null;
+  } catch (err) {
+    console.error(`Wiki fetch error for: ${query}`, err);
     return null;
   }
 };
