@@ -1,24 +1,16 @@
-export const fetchWikiSummary = async (query) => {
-  if (!query) return null;
+import axios from "axios";
 
+export const fetchWikiSummary = async (name) => {
   try {
-    // encode query to handle spaces and special chars
-    const encoded = encodeURIComponent(query);
-    const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encoded}`;
+    const cleanName = name.replace(/\(.*?\)/g, "").trim();
 
-    const res = await fetch(url);
+    const res = await axios.get(
+      `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(cleanName)}`
+    );
 
-    if (!res.ok) {
-      console.warn(`Wiki fetch failed for: ${query}`);
-      return null;
-    }
-
-    const data = await res.json();
-
-    // return extract (summary) or null
-    return data.extract || null;
-  } catch (err) {
-    console.error(`Wiki fetch error for: ${query}`, err);
+    return res.data;
+  } catch {
+    // Silent fail — many artists don't have pages
     return null;
   }
 };

@@ -1,37 +1,51 @@
 import axios from "axios";
 
-const MET_BASE_URL = "https://collectionapi.metmuseum.org/public/collection/v1";
+const BASE = "https://collectionapi.metmuseum.org/public/collection/v1";
 
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
-export const searchArtworks = async (query = "painting") => {
+export const searchArtworks = async (query) => {
   try {
-    const res = await axios.get(`${MET_BASE_URL}/search`, {
-      params: {
-        q: query,
-        hasImages: true, // only artworks with images
-      },
+    const res = await axios.get(`${BASE}/search`, {
+      params: { q: query, hasImages: true },
     });
 
-    if (res.data?.objectIDs?.length) {
-      return res.data.objectIDs;
-    }
-    return [];
+    return res.data.objectIDs || [];
   } catch (err) {
-    console.error("Met API search error:", err);
+    console.error("Search error:", err);
     return [];
   }
 };
 
-
-export const getArtwork = async (objectID) => {
-  if (!objectID) return null;
-
+export const getArtwork = async (id) => {
   try {
-    const res = await axios.get(`${MET_BASE_URL}/objects/${objectID}`);
-    if (res.data) return res.data;
-    return null;
-  } catch (err) {
-    console.warn(`Met API error fetching artwork ${objectID}:`, err);
+    const res = await axios.get(`${BASE}/objects/${id}`);
+    return res.data;
+  } catch {
+    console.warn("Met API blocked id:", id);
     return null;
   }
+};
+
+
+export const fetchArtworksSafe = async (ids, limit = 20) => {
+  const results = [];
+
+  for (let i = 0; i < ids.length && results.length < limit; i++) {
+    const art = await getArtwork(ids[i]);
+
+    if (art && art.primaryImageSmall) {
+      results.push({
+        id: art.objectID,
+        title: art.title,
+        artist: art.artistDisplayName || "Unknown Artist",
+        date: art.objectDate,
+        image: art.primaryImageSmall,
+      });
+    }
+
+    await delay(120);
+  }
+
+  return results;
 };

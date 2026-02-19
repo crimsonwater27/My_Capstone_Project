@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { searchArtworks, getArtwork } from "../services/metMuseumApi";
+import { searchArtworks, fetchArtworksSafe } from "../services/metMuseumApi";
 import { fetchWikiSummary } from "../services/wikiApi";
 import { parseYear } from "../utils/parseYear";
 
@@ -27,52 +27,18 @@ fetchArtworks: async (query = "painting") => {
 
     const ids = await searchArtworks(query);
 
-    if (!ids?.length) {
-      set({
-        artworks: [],
-        filteredArtworks: [],
-        loading: false,
-        error: "No artworks found.",
-      });
+    if (!ids.length) {
+      set({ artworks: [], loading: false });
       return;
     }
 
-    const limitedIds = ids.slice(0, 30);
+    const artworks = await fetchArtworksSafe(ids, 20);
 
-    const data = await Promise.all(
-      limitedIds.map(async (id) => {
-        try {
-          const art = await getArtwork(id);
-          if (!art?.primaryImageSmall) return null;
-
-          return {
-            id: art.objectID,
-            title: art.title,
-            artist: art.artistDisplayName || "Unknown",
-            date: art.objectDate,
-            image: art.primaryImageSmall,
-          };
-        } catch {
-          return null;
-        }
-      })
-    );
-
-    const clean = data.filter(Boolean);
-
-    set({
-      artworks: clean,
-      loading: false,
-      error: clean.length ? null : "No images available.",
-    });
-
+    set({ artworks, loading: false });
     get().filterArtworks();
   } catch (err) {
-    console.error(err);
-    set({
-      error: "Failed to load artworks. Please try again.",
-      loading: false,
-    });
+    console.error("Fetch failed:", err);
+    set({ error: "Failed to load artworks", loading: false });
   }
 },
 
@@ -88,28 +54,33 @@ fetchArtworks: async (query = "painting") => {
     set({ filteredArtworks: filtered });
   },
 
-  selectArtwork: async (art) => {
+selectArtwork: async (art) => {
+  set({
+    selectedArtwork: art,
+    modalLoading: true,
+    wikiData: null,
+  });
+
+  const artistName = art?.artist?.trim();
+
+  if (!artistName || artistName === "Unknown Artist") {
+    set({ modalLoading: false });
+    return;
+  }
+
+  try {
+    const wiki = await fetchWikiSummary(artistName);
+
     set({
-      selectedArtwork: art,
-      modalLoading: true,
-      wikiData: null,
+      wikiData: wiki || null,
+      modalLoading: false,
     });
+  } catch {
+    console.warn("Wiki fetch failed:", artistName);
+    set({ modalLoading: false, wikiData: null });
+  }
+},
 
-    if (!art?.artist) {
-      set({ modalLoading: false });
-      return;
-    }
-
-    try {
-      
-      const safeName = encodeURIComponent(art.artist.replace(/["']/g, ""));
-      const wiki = await fetchWikiSummary(safeName);
-
-      set({ wikiData: wiki, modalLoading: false });
-    } catch {
-      set({ modalLoading: false, wikiData: { extract: "No summary available." } });
-    }
-  },
 
   closeModal: () =>
     set({
