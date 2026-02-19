@@ -13,6 +13,7 @@ export const useArtStore = create((set, get) => ({
   loading: false,
   modalLoading: false,
   error: null,
+  modalError: null,
 
   yearRange: [1400, 1800],
 
@@ -59,25 +60,37 @@ selectArtwork: async (art) => {
     selectedArtwork: art,
     modalLoading: true,
     wikiData: null,
+    modalError: null,
   });
 
   const artistName = art?.artist?.trim();
 
   if (!artistName || artistName === "Unknown Artist") {
-    set({ modalLoading: false });
+    set({
+      modalLoading: false,
+      modalError: "No artist information available."
+    });
     return;
   }
 
   try {
     const wiki = await fetchWikiSummary(artistName);
 
+    if (!wiki) {
+      throw new Error("No Wikipedia page found");
+    }
+
     set({
-      wikiData: wiki || null,
+      wikiData: wiki,
       modalLoading: false,
+      modalError: null,
     });
-  } catch {
-    console.warn("Wiki fetch failed:", artistName);
-    set({ modalLoading: false, wikiData: null });
+  } catch (error) {
+    set({ 
+      modalLoading: false,
+      wikiData: null, 
+      modalError: error.message 
+    });
   }
 },
 
@@ -86,6 +99,8 @@ selectArtwork: async (art) => {
     set({
       selectedArtwork: null,
       wikiData: null,
+      modalError: null,
+      modalLoading: false,
     }),
 
   addFavorite: (art) =>
