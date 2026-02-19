@@ -21,49 +21,60 @@ export const useArtStore = create((set, get) => ({
     get().filterArtworks();
   },
 
-  fetchArtworks: async (query = "painting") => {
-    try {
-      set({ loading: true, error: null });
+fetchArtworks: async (query = "painting") => {
+  try {
+    set({ loading: true, error: null });
 
-      
-      const ids = await searchArtworks(query);
-      if (!ids?.length) {
-        set({ artworks: [], loading: false });
-        return;
-      }
+    const ids = await searchArtworks(query);
 
-      const limitedIds = ids.slice(0, 30);
-
-      
-      const data = await Promise.all(
-        limitedIds.map(async (id) => {
-          try {
-            const art = await getArtwork(id);
-            if (!art || !art.primaryImageSmall) return null;
-
-            return {
-              id: art.objectID,                // unique key
-              title: art.title,
-              artist: art.artistDisplayName || "Unknown",
-              date: art.objectDate,
-              image: art.primaryImageSmall,
-            };
-          } catch (err) {
-            console.error(`Failed to fetch artwork ${id}:`, err);
-            return null;
-          }
-        })
-      );
-
-      const cleanData = data.filter(Boolean);
-      set({ artworks: cleanData, loading: false });
-
-      get().filterArtworks();
-    } catch (err) {
-      console.error("Failed to fetch artworks:", err);
-      set({ error: "Failed to fetch artworks", loading: false });
+    if (!ids?.length) {
+      set({
+        artworks: [],
+        filteredArtworks: [],
+        loading: false,
+        error: "No artworks found.",
+      });
+      return;
     }
-  },
+
+    const limitedIds = ids.slice(0, 30);
+
+    const data = await Promise.all(
+      limitedIds.map(async (id) => {
+        try {
+          const art = await getArtwork(id);
+          if (!art?.primaryImageSmall) return null;
+
+          return {
+            id: art.objectID,
+            title: art.title,
+            artist: art.artistDisplayName || "Unknown",
+            date: art.objectDate,
+            image: art.primaryImageSmall,
+          };
+        } catch {
+          return null;
+        }
+      })
+    );
+
+    const clean = data.filter(Boolean);
+
+    set({
+      artworks: clean,
+      loading: false,
+      error: clean.length ? null : "No images available.",
+    });
+
+    get().filterArtworks();
+  } catch (err) {
+    console.error(err);
+    set({
+      error: "Failed to load artworks. Please try again.",
+      loading: false,
+    });
+  }
+},
 
   filterArtworks: () => {
     const { artworks, yearRange } = get();
