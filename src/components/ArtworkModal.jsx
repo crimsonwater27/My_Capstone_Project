@@ -12,6 +12,7 @@ export const ArtworkModal = () => {
     selectArtwork,
   } = useArtStore();
 
+  // Lock background scroll while modal is open
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -41,27 +42,22 @@ export const ArtworkModal = () => {
         />
 
         {/* Artwork info */}
-        <h2 className="text-2xl font-semibold">
-          {selectedArtwork.title}
-        </h2>
-
+        <h2 className="text-2xl font-semibold">{selectedArtwork.title}</h2>
         <p className="text-gray-700">
           {selectedArtwork.artist || "Unknown Artist"} |{" "}
           {selectedArtwork.date || "Unknown Date"}
         </p>
 
-        {/* Wiki summary */}
-        <div className="mt-4">
-          {modalLoading && (
-            <Spinner text="Loading artist info..." />
-          )}
+        {/* Wiki summary / spinner / error */}
+        <div className="mt-4 flex flex-col items-center justify-center min-h-[120px]">
+          {modalLoading && <Spinner text="Loading artist info..." />}
 
           {modalError && (
-            <div className="text-red-500 text-sm">
-              <p>{modalError}</p>
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative text-center">
+              <p className="font-medium">{modalError}</p>
               <button
                 onClick={() => selectArtwork(selectedArtwork)}
-                className="mt-2 px-3 py-1 bg-gray-800 text-white rounded"
+                className="mt-2 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
               >
                 Retry
               </button>
@@ -69,9 +65,7 @@ export const ArtworkModal = () => {
           )}
 
           {!modalLoading && !modalError && wikiData && (
-            <p className="text-gray-700">
-              {wikiData.extract}
-            </p>
+            <p className="text-gray-700">{wikiData.extract}</p>
           )}
 
           {!modalLoading && !modalError && !wikiData && (

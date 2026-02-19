@@ -48,7 +48,7 @@ export default function Dashboard() {
   <div className="grid lg:grid-cols-4 gap-6 items-start justify-center px-4 sm:px-6 lg:px-8 py-6">
 
     {/* Main */}
-    <div className="lg:col-span-3 space-y-6">
+    <div className="lg:col-span-3 space-y-6 justify-center">
       <h1 className="text-xl md:text-2xl font-bold">
         Artwork Images
       </h1>
