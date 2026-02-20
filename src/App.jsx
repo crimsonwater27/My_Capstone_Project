@@ -6,6 +6,8 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Dashboard from "./pages/Dashboard";
 import ArtworkModal from "./components/ArtworkModal";
+import ProtectedRoute from "./components/ProtectedRoute";
+import LoginPage from "./pages/LoginPage";
 
 function App() {
   return (
@@ -20,6 +22,16 @@ function App() {
           <Route path="/artwork/:id" element={<ArtworkDetail />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/modal" element={<ArtworkModal />} />
+          <Route path="/login" element={<LoginPage />} />
+          {/* Protected Routes */}
+          <Route
+            path="/favorites"
+            element={
+              <ProtectedRoute>
+                <Favorites />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
         </div>
       </main>

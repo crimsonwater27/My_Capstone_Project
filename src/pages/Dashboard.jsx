@@ -37,7 +37,7 @@ export default function Dashboard() {
 
 
   return (
-<section className="space-y-6 min-h-screen bg-[#121212] text-yellow">
+<section className="space-y-6 min-h-screen text-yellow">
 
   <div className="space-y-4">
     <SearchBar />

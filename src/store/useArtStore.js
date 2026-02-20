@@ -6,7 +6,7 @@ import { parseYear } from "../utils/parseYear";
 export const useArtStore = create((set, get) => ({
   artworks: [],
   filteredArtworks: [],
-  favorites: JSON.parse(localStorage.getItem("favorites")) || [],
+  favorites: JSON.parse(localStorage.getItem("user"))?.favorites || [],
   selectedArtwork: null,
   wikiData: null,
 
@@ -97,6 +97,8 @@ selectArtwork: async (art) => {
 
 toggleFavorite: (art) =>
   set((state) => {
+    if (!state.user) return state;
+
     const exists = state.favorites.some(
       (item) => item.id === art.id
     );
@@ -105,12 +107,24 @@ toggleFavorite: (art) =>
       ? state.favorites.filter((item) => item.id !== art.id)
       : [...state.favorites, art];
 
-    localStorage.setItem(
-      "favorites",
-      JSON.stringify(updatedFavorites)
+    const updatedUser = {
+      ...state.user,
+      favorites: updatedFavorites,
+    };
+
+    // Update users in localStorage
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const updatedUsers = users.map((u) =>
+      u.id === updatedUser.id ? updatedUser : u
     );
 
-    return { favorites: updatedFavorites };
+    localStorage.setItem("users", JSON.stringify(updatedUsers));
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+
+    return {
+      favorites: updatedFavorites,
+      user: updatedUser,
+    };
   }),
 
   closeModal: () =>
@@ -135,4 +149,52 @@ toggleFavorite: (art) =>
       localStorage.setItem("favorites", JSON.stringify(updated));
       return { favorites: updated };
     }),
+
+user: JSON.parse(localStorage.getItem("user")) || null,
+
+login: (email, password) => {
+  const users = JSON.parse(localStorage.getItem("users")) || [];
+
+  const existingUser = users.find(
+    (u) => u.email === email && u.password === password
+  );
+
+  if (!existingUser) {
+    throw new Error("Invalid email or password");
+  }
+
+  localStorage.setItem("user", JSON.stringify(existingUser));
+
+  set({ user: existingUser });
+},
+
+register: (email, password) => {
+  const users = JSON.parse(localStorage.getItem("users")) || [];
+
+  const alreadyExists = users.find((u) => u.email === email);
+
+  if (alreadyExists) {
+    throw new Error("User already exists");
+  }
+
+  const newUser = {
+    id: Date.now(),
+    email,
+    password,
+    favorites: [],
+  };
+
+  const updatedUsers = [...users, newUser];
+
+  localStorage.setItem("users", JSON.stringify(updatedUsers));
+  localStorage.setItem("user", JSON.stringify(newUser));
+
+  set({ user: newUser });
+},
+
+logout: () => {
+  localStorage.removeItem("user");
+  set({ user: null, favorites: [] });
+},
+
 }));
