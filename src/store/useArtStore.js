@@ -15,7 +15,7 @@ export const useArtStore = create((set, get) => ({
   error: null,
   modalError: null,
 
-  yearRange: [1400, 1800],
+  yearRange: [1400, 2000],
 
   setYearRange: (range) => {
     set({ yearRange: range });

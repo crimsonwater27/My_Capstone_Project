@@ -1,7 +1,7 @@
 import React from "react";
 import { useArtStore } from "../store/useArtStore";
 
-export const ArtworkGrid = () => {
+export default function ArtworkGrid() {
   const {
     filteredArtworks,
     selectArtwork,
@@ -9,72 +9,78 @@ export const ArtworkGrid = () => {
     favorites,
   } = useArtStore();
 
-  const isFavorited = (artwork) =>
-    favorites.some((item) => item.id === artwork.id);
+  const isFavorited = (art) =>
+    favorites.some((item) => item.id === art.id);
 
   if (!filteredArtworks?.length) {
-    return <p className="text-center mt-8">No artworks found.</p>;
+    return (
+      <p className="text-center mt-8 text-gray-400">
+        No artworks found.
+      </p>
+    );
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 p-6">
+    <div className="grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
       {filteredArtworks.map((art) => {
-        const favorited = isFavorited(art);
+        const unavailable = art.title === "Unavailable";
 
         return (
           <div
             key={art.id}
-            className="relative border rounded overflow-hidden shadow hover:shadow-xl transition duration-300 bg-white"
+            className="bg-[#1E1E1E] rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition relative flex flex-col"
           >
-            {/* FAVORITED BADGE */}
-            {favorited && (
-              <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded shadow">
-                Favorited
-              </div>
-            )}
+            {/* Image Container */}
+            <div className="relative">
+              <img
+                src={art.image || "/placeholder.png"}
+                alt={art.title}
+                onError={(e) => (e.target.src = "/12th digital drawing.jpg")}
+                onClick={() => !unavailable && selectArtwork(art)}
+                className="w-full h-64 object-cover rounded-t-2xl cursor-pointer"
+              />
 
-            {/* HEART ICON */}
-            <button
-              onClick={() => toggleFavorite(art)}
-              className={`absolute top-2 left-2 text-2xl transition transform ${
-                favorited
-                  ? "text-red-400 scale-110"
-                  : "text-gray-200 hover:text-red-200"
-              } hover:scale-125`}
-            >
-              {favorited ? "❤️" : "🤍"}
-            </button>
-
-            {/* CLICKABLE IMAGE */}
-            <div
-              className="cursor-pointer"
-              onClick={() => selectArtwork(art)}
-            >
-              {art.image ? (
-                <img
-                  src={art.image}
-                  alt={art.title}
-                  className="w-full h-64 object-cover"
-                />
-              ) : (
-                <div className="w-full h-64 flex items-center justify-center bg-gray-200 text-gray-600">
-                  No Image
+              {/* Overlay if unavailable */}
+              {unavailable && (
+                <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-semibold text-sm">
+                  Data Unavailable
                 </div>
               )}
             </div>
 
-            <div className="p-3 space-y-1">
-              <h3 className="font-semibold">{art.title}</h3>
-              <p className="text-sm text-gray-500">
-                {art.artist || "Unknown Artist"}
-              </p>
-              <p className="text-sm text-gray-400">{art.date}</p>
+            {/* Info Section */}
+            <div className="p-4 flex flex-col justify-between flex-1">
+              <div>
+                <h3 className="text-sm font-semibold text-white">
+                  {art.title}
+                </h3>
+                <p className="text-xs text-gray-400">
+                  {art.artist || "Unknown Artist"}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {art.date || "Unknown Date"}
+                </p>
+              </div>
+
+              {/* Favorites Button */}
+              {!unavailable && (
+                <button
+                  onClick={() => toggleFavorite(art)}
+                  className={`mt-3 w-full py-2 rounded-lg transition font-semibold ${
+                    isFavorited(art)
+                      ? "bg-red-500 text-white hover:bg-red-600"
+                      : "bg-gray-700 text-white hover:bg-gray-600"
+                  }`}
+                >
+                  {isFavorited(art)
+                    ? "Remove from Favorites"
+                    : "Add to Favorites"}
+                </button>
+              )}
             </div>
           </div>
         );
       })}
     </div>
   );
-};
-
-export default ArtworkGrid;
+}

@@ -12,7 +12,6 @@ export const ArtworkModal = () => {
     selectArtwork,
   } = useArtStore();
 
-  // Lock background scroll while modal is open
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -23,12 +22,13 @@ export const ArtworkModal = () => {
   if (!selectedArtwork) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg max-w-2xl w-full p-4 relative shadow-lg">
+    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+      <div className="bg-[#1E1E1E] rounded-3xl max-w-3xl w-full p-6 relative shadow-2xl text-white">
+        
         {/* Close button */}
         <button
           onClick={closeModal}
-          className="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-xl font-bold"
+          className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl font-bold"
         >
           ×
         </button>
@@ -38,22 +38,22 @@ export const ArtworkModal = () => {
           src={selectedArtwork.image}
           alt={selectedArtwork.title}
           onError={(e) => (e.target.src = "/12th digital drawing.jpg")}
-          className="w-full h-96 object-cover rounded mb-4"
+          className="w-full h-96 object-cover rounded-2xl mb-6"
         />
 
         {/* Artwork info */}
         <h2 className="text-2xl font-semibold">{selectedArtwork.title}</h2>
-        <p className="text-gray-700">
+        <p className="text-gray-400">
           {selectedArtwork.artist || "Unknown Artist"} |{" "}
           {selectedArtwork.date || "Unknown Date"}
         </p>
 
-        {/* Wiki summary / spinner / error */}
-        <div className="mt-4 flex flex-col items-center justify-center min-h-[120px]">
+        {/* Wiki summary */}
+        <div className="mt-6 min-h-[120px]">
           {modalLoading && <Spinner text="Loading artist info..." />}
-
+          
           {modalError && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative text-center">
+            <div className="bg-red-600/20 border border-red-400 text-red-400 px-4 py-3 rounded">
               <p className="font-medium">{modalError}</p>
               <button
                 onClick={() => selectArtwork(selectedArtwork)}
@@ -65,11 +65,11 @@ export const ArtworkModal = () => {
           )}
 
           {!modalLoading && !modalError && wikiData && (
-            <p className="text-gray-700">{wikiData.extract}</p>
+            <p className="text-gray-300">{wikiData.extract}</p>
           )}
 
           {!modalLoading && !modalError && !wikiData && (
-            <p className="text-gray-400 italic">
+            <p className="text-gray-500 italic">
               No additional info available for this artist.
             </p>
           )}

@@ -1,7 +1,6 @@
 import axios from "axios";
 
 const BASE = "https://collectionapi.metmuseum.org/public/collection/v1";
-
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 export const searchArtworks = async (query) => {
@@ -27,7 +26,7 @@ export const getArtwork = async (id) => {
   }
 };
 
-
+// ✅ Safe fetch function with placeholders
 export const fetchArtworksSafe = async (ids, limit = 20) => {
   const results = [];
 
@@ -37,13 +36,23 @@ export const fetchArtworksSafe = async (ids, limit = 20) => {
     if (art && art.primaryImageSmall) {
       results.push({
         id: art.objectID,
-        title: art.title,
+        title: art.title || "Untitled",
         artist: art.artistDisplayName || "Unknown Artist",
-        date: art.objectDate,
+        date: art.objectDate || "Unknown Date",
         image: art.primaryImageSmall,
+      });
+    } else {
+      // Placeholder for blocked or missing images
+      results.push({
+        id: ids[i],
+        title: "Unavailable",
+        artist: "Unknown Artist",
+        date: "Unknown Date",
+        image: "/placeholder.png",
       });
     }
 
+    // Small delay to reduce API load
     await delay(120);
   }
 

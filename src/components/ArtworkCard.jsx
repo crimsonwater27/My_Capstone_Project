@@ -10,7 +10,7 @@ export default function ArtworkCard({ art }) {
     <div style={{ border: "1px solid #ccc", padding: 12, margin: 10 }}>
       {/* IMAGE */}
       {art.image ? (
-        <img src={art.image} alt={art.title} width="200" />
+        <img src={art.image} alt={art.title} className="w-full h-64 aspect-[4/3] rounded" />
       ) : (
         <div style={{ width: 200, height: 150, background: "#ddd" }}>
           No image
