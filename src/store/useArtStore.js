@@ -56,6 +56,20 @@ fetchArtworks: async (query = "painting") => {
   },
 
 selectArtwork: async (art) => {
+  const artistName = art?.artist?.trim();
+
+  
+  if (!artistName || artistName === "Unknown Artist") {
+    set({
+      selectedArtwork: art,
+      wikiData: null,
+      modalLoading: false,
+      modalError: null,
+    });
+    return;
+  }
+
+  
   set({
     selectedArtwork: art,
     modalLoading: true,
@@ -63,37 +77,41 @@ selectArtwork: async (art) => {
     modalError: null,
   });
 
-  const artistName = art?.artist?.trim();
-
-  if (!artistName || artistName === "Unknown Artist") {
-    set({
-      modalLoading: false,
-      modalError: "No artist information available."
-    });
-    return;
-  }
-
   try {
     const wiki = await fetchWikiSummary(artistName);
 
-    if (!wiki) {
-      throw new Error("No Wikipedia page found");
-    }
-
     set({
-      wikiData: wiki,
+      wikiData: wiki || null,
       modalLoading: false,
-      modalError: null,
+      modalError: wiki ? null : "No info found for this artist",
     });
-  } catch (error) {
-    set({ 
+  } catch (err) {
+    console.warn("Wiki fetch failed:", artistName, err);
+    set({
+      modalError: "Failed to fetch artist info",
       modalLoading: false,
-      wikiData: null, 
-      modalError: error.message 
+      wikiData: null,
     });
   }
 },
 
+toggleFavorite: (art) =>
+  set((state) => {
+    const exists = state.favorites.some(
+      (item) => item.id === art.id
+    );
+
+    const updatedFavorites = exists
+      ? state.favorites.filter((item) => item.id !== art.id)
+      : [...state.favorites, art];
+
+    localStorage.setItem(
+      "favorites",
+      JSON.stringify(updatedFavorites)
+    );
+
+    return { favorites: updatedFavorites };
+  }),
 
   closeModal: () =>
     set({
