@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useArtStore } from "../store/useArtStore";
-import { Motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 import Spinner from "../components/Spinner";
 import ErrorMessage from "../components/ErrorMessage";
 import ArtworkGrid from "../components/ArtworkGrid";
@@ -70,14 +70,14 @@ export default function Dashboard() {
             {era ? `${era} Artworks` : "Artwork Images"}
           </h1>
           
-          <Motion
+          <Motion.div
             key={era}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
             <ArtworkGrid artworks={artworks} />
-          </Motion>
+          </Motion.div>
         </div>
 
 
