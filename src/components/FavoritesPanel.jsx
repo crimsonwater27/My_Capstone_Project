@@ -8,7 +8,7 @@ export default function FavoritesPanel() {
     return (
       <div className="bg-[#1E1E1E] rounded-2xl p-4 shadow-md space-y-2">
         <h2 className="text-lg font-semibold text-yellow-400">Favorites</h2>
-        <p className="text-gray-400 text-sm">No favorites yet.</p>
+        <p className="text-gray-400 text-sm">No favorites yet! Your personal museum awaits!</p>
       </div>
     );
   }

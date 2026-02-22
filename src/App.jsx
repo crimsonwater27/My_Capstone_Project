@@ -20,7 +20,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/artwork/:id" element={<ArtworkDetail />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/:era?" element={<Dashboard />} />
           <Route path="/modal" element={<ArtworkModal />} />
           <Route path="/login" element={<LoginPage />} />
           {/* Protected Routes */}

@@ -16,32 +16,50 @@ export const useArtStore = create((set, get) => ({
   modalError: null,
 
   yearRange: [1400, 2000],
+  currentQuery: null,
 
   setYearRange: (range) => {
     set({ yearRange: range });
     get().filterArtworks();
   },
 
-fetchArtworks: async (query = "painting") => {
-  try {
-    set({ loading: true, error: null });
+  fetchArtworks: async (query = "painting") => {
+    try {
+      const currentQuery = get().currentQuery;
+      if (currentQuery === query) return; // prevent duplicate fetch
 
-    const ids = await searchArtworks(query);
+      set({ loading: true, error: null, currentQuery: query });
 
-    if (!ids.length) {
-      set({ artworks: [], loading: false });
-      return;
+      const eraQueryMap = {
+        Renaissance: "Renaissance painting 1400-1600",
+        Baroque: "Baroque painting 1600-1750",
+        Romanticism: "Romanticism painting 1800-1850",
+        "Modern Art": "Modern painting 1900-1970",
+      };
+
+      const enhancedQuery =
+        eraQueryMap[query] || `${query} painting`;
+
+      const ids = await searchArtworks(enhancedQuery);
+
+      if (!ids.length) {
+        set({ artworks: [], filteredArtworks: [], loading: false });
+        return;
+      }
+
+      const artworks = await fetchArtworksSafe(ids, 20);
+
+      set({ artworks, loading: false });
+
+      get().filterArtworks();
+    } catch (err) {
+      console.error("Error fetching artworks:", err);
+      set({
+        error: "Failed to fetch artworks. Please try again.",
+        loading: false,
+      });
     }
-
-    const artworks = await fetchArtworksSafe(ids, 20);
-
-    set({ artworks, loading: false });
-    get().filterArtworks();
-  } catch (err) {
-    console.error("Fetch failed:", err);
-    set({ error: "Failed to load artworks", loading: false });
-  }
-},
+  },
 
   filterArtworks: () => {
     const { artworks, yearRange } = get();
