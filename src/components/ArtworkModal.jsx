@@ -38,7 +38,7 @@ export const ArtworkModal = () => {
           src={selectedArtwork.image}
           alt={selectedArtwork.title}
           onError={(e) => (e.target.src = "/12th digital drawing.jpg")}
-          className="w-full h-96 object-cover rounded-2xl mb-6"
+          className="max-h-[70vh] w-auto h-auto object-contain mx-auto"
         />
 
         {/* Artwork info */}

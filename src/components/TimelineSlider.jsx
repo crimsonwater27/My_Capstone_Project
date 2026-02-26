@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function TimelineSlider({ yearRange = [1400, 2000], setYearRange }) {
+export default function TimelineSlider({ yearRange = [500, 2020], setYearRange }) {
   const [start, end] = yearRange;
 
   const handleStartChange = (e) => {
@@ -24,16 +24,16 @@ export default function TimelineSlider({ yearRange = [1400, 2000], setYearRange 
       <div className="space-y-2">
         <input
           type="range"
-          min="1000"
-          max="2000"
+          min="500"
+          max="2025"
           value={start}
           onChange={handleStartChange}
           className="w-full accent-yellow-400"
         />
         <input
           type="range"
-          min="1000"
-          max="2000"
+          min="500"
+          max="2025"
           value={end}
           onChange={handleEndChange}
           className="w-full accent-yellow-400"

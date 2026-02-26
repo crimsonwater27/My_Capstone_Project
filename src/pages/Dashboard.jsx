@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { useParams } from "react-router-dom";
 import { useArtStore } from "../store/useArtStore";
 import { motion as Motion } from "framer-motion";
@@ -8,50 +8,49 @@ import ArtworkGrid from "../components/ArtworkGrid";
 import TimelineSlider from "../components/TimelineSlider";
 import SearchBar from "../components/SearchBar";
 import Filters from "../components/Filters";
-import ArtworkModal from "../components/ArtworkModal";
 import FavoritesPanel from "../components/FavoritesPanel";
+import ModalSkeleton from "../components/ModalSkeleton";
+
+const ArtworkModal = lazy(() => import("../components/ArtworkModal"));
 
 export default function Dashboard() {
   const { era } = useParams();
 
-  const {
-    fetchArtworks,
-    filteredArtworks: artworks,
-    selectedArtwork,
-    loading,
-    error,
-    yearRange,
-    setYearRange,
-  } = useArtStore();
-  
+  const fetchArtworks = useArtStore((s) => s.fetchArtworks);
+  const artworks = useArtStore((s) => s.filteredArtworks);
+  const selectedArtwork = useArtStore((s) => s.selectedArtwork);
+  const loading = useArtStore((s) => s.loading);
+  const error = useArtStore((s) => s.error);
+  const yearRange = useArtStore((s) => s.yearRange);
+  const setYearRange = useArtStore((s) => s.setYearRange);
+
   const eraThemes = {
-  Renaissance: "text-amber-300",
-  Baroque: "text-purple-400",
-  Romanticism: "text-pink-400",
-  "Modern Art": "text-cyan-400",
-};
+    Renaissance: "text-amber-300",
+    Baroque: "text-purple-400",
+    Romanticism: "text-pink-400",
+    "Modern Art": "text-cyan-400",
+    Contemporary: "text-green-400",
+    Rococo: "text-yellow-400",
+    Realism: "text-blue-400",
+    Surrealism: "text-indigo-400",
+  };
 
   useEffect(() => {
-    fetchArtworks(era || "painting");
+    if (era) fetchArtworks(era);
+    else fetchArtworks("painting");
   }, [fetchArtworks, era]);
 
   if (loading) return <Spinner text="Loading artworks..." />;
 
   if (error)
-    return (
-      <ErrorMessage
-        message={error}
-        onRetry={() => fetchArtworks(era || "painting")}
-      />
-    );
+    return <ErrorMessage message={error} onRetry={() => fetchArtworks(era || "painting")} />;
 
   return (
-    <section 
+    <section
       className={`space-y-6 min-h-screen bg-[#121212] ${
         eraThemes[era] || "text-yellow-300"
-        } transition-colors duration-500`}
-        >
-
+      } transition-colors duration-500`}
+    >
       {/* Search + Filters */}
       <div className="space-y-4 px-4 sm:px-6 lg:px-8">
         <SearchBar />
@@ -61,15 +60,12 @@ export default function Dashboard() {
 
       {/* Grid + Sidebar */}
       <div className="grid lg:grid-cols-4 gap-6 items-start justify-center px-4 sm:px-6 lg:px-8 py-6">
-
         {/* Main Panel */}
         <div className="lg:col-span-3 space-y-6">
-          <h1
-          className={`text-xl md:text-2xl font-bold ${eraThemes[era] || "text-yellow-300"}`}
-          >
+          <h1 className={`text-xl md:text-2xl font-bold ${eraThemes[era] || "text-yellow-300"}`}>
             {era ? `${era} Artworks` : "Artwork Images"}
           </h1>
-          
+
           <Motion.div
             key={era}
             initial={{ opacity: 0, y: 20 }}
@@ -80,15 +76,17 @@ export default function Dashboard() {
           </Motion.div>
         </div>
 
-
         {/* Sidebar */}
         <div className="lg:col-span-1">
           <FavoritesPanel />
         </div>
-
       </div>
 
-      {selectedArtwork && <ArtworkModal />}
+      {selectedArtwork && (
+        <Suspense fallback={<ModalSkeleton />}>
+          <ArtworkModal />
+        </Suspense>
+      )}
     </section>
   );
 }

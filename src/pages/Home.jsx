@@ -5,7 +5,7 @@ export default function Home() {
   const [eras, setEras] = useState({});
   const navigate = useNavigate();
 
-  const eraList = ["Renaissance", "Baroque", "Romanticism", "Modern Art"];
+  const eraList = ["Renaissance", "Baroque", "Romanticism", "Modern Art", "Contemporary", "Rococo", "Realism", "Surrealism"];
 
   useEffect(() => {
     async function fetchArtworks() {

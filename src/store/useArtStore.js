@@ -1,149 +1,179 @@
 import { create } from "zustand";
 import { searchArtworks, fetchArtworksSafe } from "../services/metMuseumApi";
+import { searchArtworksByDate } from "../services/metMuseumApi";
 import { fetchWikiSummary } from "../services/wikiApi";
 import { parseYear } from "../utils/parseYear";
 
 export const useArtStore = create((set, get) => ({
+  // Core State
   artworks: [],
   filteredArtworks: [],
-  favorites: JSON.parse(localStorage.getItem("user"))?.favorites || [],
   selectedArtwork: null,
+  selectedEra: null,
   wikiData: null,
+  favorites: [],
+  user: JSON.parse(localStorage.getItem("user")) || null,
 
   loading: false,
   modalLoading: false,
   error: null,
   modalError: null,
 
-  yearRange: [1400, 2000],
+  yearRange: [500, 2025],
   currentQuery: null,
+  artworkCache: {},
 
-  setYearRange: (range) => {
-    set({ yearRange: range });
-    get().filterArtworks();
+  // Era Definitions
+  eraQueryMap: {
+    Medieval: "Medieval painting",
+    Renaissance: "Renaissance painting",
+    Baroque: "Baroque painting",
+    Romanticism: "Romanticism painting",
+    "Modern Art": "Modern art painting",
+    Rococo: "Rococo painting",
+    Realism: "Realist painting",
+    Surrealism: "Surrealist painting",
+    Contemporary: "Contemporary art painting",
   },
 
-  fetchArtworks: async (query = "painting") => {
+  eraYearMap: {
+    Medieval: [500, 1450],
+    Renaissance: [1300, 1600],
+    Baroque: [1600, 1750],
+    Rococo: [1690, 1785],          
+    Romanticism: [1790, 1855],
+    Realism: [1840, 1905],
+    "Modern Art": [1860, 1975],
+    Surrealism: [1900, 1960], 
+    Contemporary: [1945, 2025],
+  },
+
+  // Set Year Range (Slider)
+  setYearRange: (range) => {
+    set({ yearRange: range });
+    get().applyFilters();
+  },
+
+  // Fetch Artworks
+  fetchArtworks: async (eraOrQuery = "painting") => {
+    const { artworkCache, eraQueryMap, eraYearMap } = get();
+
+    const isEra = eraQueryMap[eraOrQuery];
+    const query = isEra ? eraQueryMap[eraOrQuery] : eraOrQuery;
+    const eraRange = isEra ? eraYearMap[eraOrQuery] : [500, 2025];
+
+    // If cached
+    if (artworkCache[eraOrQuery]) {
+      set({
+        artworks: artworkCache[eraOrQuery],
+        filteredArtworks: artworkCache[eraOrQuery],
+        selectedEra: isEra ? eraOrQuery : null,
+        yearRange: eraRange,
+        loading: false,
+        error: null,
+      });
+      get().applyFilters();
+      return;
+    }
+
     try {
-      const currentQuery = get().currentQuery;
-      if (currentQuery === query) return; // prevent duplicate fetch
+      set({
+        loading: true,
+        error: null,
+        selectedEra: isEra ? eraOrQuery : null,
+        yearRange: eraRange,
+      });
 
-      set({ loading: true, error: null, currentQuery: query });
-
-      const eraQueryMap = {
-        Renaissance: "Renaissance painting 1400-1600",
-        Baroque: "Baroque painting 1600-1750",
-        Romanticism: "Romanticism painting 1800-1850",
-        "Modern Art": "Modern painting 1900-1970",
-      };
-
-      const enhancedQuery =
-        eraQueryMap[query] || `${query} painting`;
-
-      const ids = await searchArtworks(enhancedQuery);
-
-      if (!ids.length) {
-        set({ artworks: [], filteredArtworks: [], loading: false });
-        return;
+      let ids;
+      if (isEra) {
+        const [start, end] = eraRange;
+        ids = await searchArtworksByDate(start, end);
+      } else {
+        ids = await searchArtworks(query);
       }
+      
+      console.log("IDs returned:", ids.length);
 
-      const artworks = await fetchArtworksSafe(ids, 20);
+      const artworks = await fetchArtworksSafe(ids, 24);
 
-      set({ artworks, loading: false });
+      set((state) => ({
+        artworks,
+        filteredArtworks: artworks,
+        artworkCache: {
+          ...state.artworkCache,
+          [eraOrQuery]: artworks,
+        },
+        loading: false,
+      }));
 
-      get().filterArtworks();
+      get().applyFilters();
     } catch (err) {
       console.error("Error fetching artworks:", err);
-      set({
-        error: "Failed to fetch artworks. Please try again.",
-        loading: false,
-      });
+      set({ error: "Failed to fetch artworks.", loading: false });
     }
   },
 
-  filterArtworks: () => {
+  // Apply Filters (Era + Slider)
+  applyFilters: () => {
     const { artworks, yearRange } = get();
 
     const filtered = artworks.filter((art) => {
       const year = parseYear(art?.date);
-      if (!year) return true;
+      if (!year) return false;
+
       return year >= yearRange[0] && year <= yearRange[1];
     });
 
     set({ filteredArtworks: filtered });
   },
 
-selectArtwork: async (art) => {
-  const artistName = art?.artist?.trim();
+  // Reset Filters
+  resetFilters: () => {
+    set({
+      selectedEra: null,
+      yearRange: [500, 2025],
+    });
+    get().applyFilters();
+  },
 
-  
-  if (!artistName || artistName === "Unknown Artist") {
+  // Artwork Modal
+  selectArtwork: async (art) => {
+    const artistName = art?.artist?.trim();
+
+    if (!artistName || artistName === "Unknown Artist") {
+      set({
+        selectedArtwork: art,
+        wikiData: null,
+        modalLoading: false,
+        modalError: null,
+      });
+      return;
+    }
+
     set({
       selectedArtwork: art,
+      modalLoading: true,
       wikiData: null,
-      modalLoading: false,
       modalError: null,
     });
-    return;
-  }
 
-  
-  set({
-    selectedArtwork: art,
-    modalLoading: true,
-    wikiData: null,
-    modalError: null,
-  });
+    try {
+      const wiki = await fetchWikiSummary(artistName);
 
-  try {
-    const wiki = await fetchWikiSummary(artistName);
-
-    set({
-      wikiData: wiki || null,
-      modalLoading: false,
-      modalError: wiki ? null : "No info found for this artist",
-    });
-  } catch (err) {
-    console.warn("Wiki fetch failed:", artistName, err);
-    set({
-      modalError: "Failed to fetch artist info",
-      modalLoading: false,
-      wikiData: null,
-    });
-  }
-},
-
-toggleFavorite: (art) =>
-  set((state) => {
-    if (!state.user) return state;
-
-    const exists = state.favorites.some(
-      (item) => item.id === art.id
-    );
-
-    const updatedFavorites = exists
-      ? state.favorites.filter((item) => item.id !== art.id)
-      : [...state.favorites, art];
-
-    const updatedUser = {
-      ...state.user,
-      favorites: updatedFavorites,
-    };
-
-    // Update users in localStorage
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const updatedUsers = users.map((u) =>
-      u.id === updatedUser.id ? updatedUser : u
-    );
-
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-
-    return {
-      favorites: updatedFavorites,
-      user: updatedUser,
-    };
-  }),
+      set({
+        wikiData: wiki || null,
+        modalLoading: false,
+        modalError: wiki ? null : "No info found for this artist",
+      });
+    } catch (err) {
+      console.error("Error fetching wiki summary:", err);
+      set({
+        modalError: "Failed to fetch artist info",
+        modalLoading: false,
+        wikiData: null,
+      });
+    }
+  },
 
   closeModal: () =>
     set({
@@ -153,66 +183,65 @@ toggleFavorite: (art) =>
       modalLoading: false,
     }),
 
-  addFavorite: (art) =>
-    set((state) => {
-      if (state.favorites.find((a) => a.id === art.id)) return state; // prevent duplicates
-      const updated = [...state.favorites, art];
-      localStorage.setItem("favorites", JSON.stringify(updated));
-      return { favorites: updated };
-    }),
+  // Favorites
+  toggleFavorite: (art) => {
+    const user = get().user;
+    if (!user) return;
 
-  removeFavorite: (id) =>
-    set((state) => {
-      const updated = state.favorites.filter((art) => art.id !== id);
-      localStorage.setItem("favorites", JSON.stringify(updated));
-      return { favorites: updated };
-    }),
+    const exists = user.favorites.some((a) => a.id === art.id);
+    const updatedFavorites = exists
+      ? user.favorites.filter((a) => a.id !== art.id)
+      : [...user.favorites, art];
 
-user: JSON.parse(localStorage.getItem("user")) || null,
+    const updatedUser = { ...user, favorites: updatedFavorites };
 
-login: (email, password) => {
-  const users = JSON.parse(localStorage.getItem("users")) || [];
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const updatedUsers = users.map((u) =>
+      u.id === updatedUser.id ? updatedUser : u
+    );
 
-  const existingUser = users.find(
-    (u) => u.email === email && u.password === password
-  );
+    localStorage.setItem("users", JSON.stringify(updatedUsers));
+    localStorage.setItem("user", JSON.stringify(updatedUser));
 
-  if (!existingUser) {
-    throw new Error("Invalid email or password");
-  }
+    set({ favorites: updatedFavorites, user: updatedUser });
+  },
 
-  localStorage.setItem("user", JSON.stringify(existingUser));
+  // Authentication
+  login: (email, password) => {
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const existingUser = users.find(
+      (u) => u.email === email && u.password === password
+    );
 
-  set({ user: existingUser });
-},
+    if (!existingUser) throw new Error("Invalid email or password");
 
-register: (email, password) => {
-  const users = JSON.parse(localStorage.getItem("users")) || [];
+    localStorage.setItem("user", JSON.stringify(existingUser));
+    set({ user: existingUser, favorites: existingUser.favorites });
+  },
 
-  const alreadyExists = users.find((u) => u.email === email);
+  register: (email, password) => {
+    const users = JSON.parse(localStorage.getItem("users")) || [];
 
-  if (alreadyExists) {
-    throw new Error("User already exists");
-  }
+    if (users.find((u) => u.email === email))
+      throw new Error("User already exists");
 
-  const newUser = {
-    id: Date.now(),
-    email,
-    password,
-    favorites: [],
-  };
+    const newUser = {
+      id: Date.now(),
+      email,
+      password,
+      favorites: [],
+    };
 
-  const updatedUsers = [...users, newUser];
+    const updatedUsers = [...users, newUser];
 
-  localStorage.setItem("users", JSON.stringify(updatedUsers));
-  localStorage.setItem("user", JSON.stringify(newUser));
+    localStorage.setItem("users", JSON.stringify(updatedUsers));
+    localStorage.setItem("user", JSON.stringify(newUser));
 
-  set({ user: newUser });
-},
+    set({ user: newUser, favorites: [] });
+  },
 
-logout: () => {
-  localStorage.removeItem("user");
-  set({ user: null, favorites: [] });
-},
-
+  logout: () => {
+    localStorage.removeItem("user");
+    set({ user: null, favorites: [] });
+  },
 }));

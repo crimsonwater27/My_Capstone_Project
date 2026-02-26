@@ -35,6 +35,8 @@ export default function ArtworkGrid() {
               <img
                 src={art.image || "/placeholder.png"}
                 alt={art.title}
+                loading="lazy"
+                decoding="async"
                 onError={(e) => (e.target.src = "/12th digital drawing.jpg")}
                 onClick={() => !unavailable && selectArtwork(art)}
                 className="w-full h-64 object-cover rounded-t-2xl cursor-pointer"
