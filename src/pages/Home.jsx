@@ -5,7 +5,16 @@ export default function Home() {
   const [eras, setEras] = useState({});
   const navigate = useNavigate();
 
-  const eraList = ["Renaissance", "Baroque", "Romanticism", "Modern Art", "Contemporary", "Rococo", "Realism", "Surrealism"];
+  const eraList = [
+    "Renaissance",
+    "Baroque",
+    "Romanticism",
+    "Modern Art",
+    "Contemporary",
+    "Rococo",
+    "Realism",
+    "Surrealism",
+  ];
 
   useEffect(() => {
     async function fetchArtworks() {
@@ -17,7 +26,6 @@ export default function Home() {
             `https://collectionapi.metmuseum.org/public/collection/v1/search?q=${era}&hasImages=true`
           );
           const searchData = await searchRes.json();
-
           const objectIDs = searchData.objectIDs?.slice(0, 1);
 
           if (objectIDs) {
@@ -25,7 +33,6 @@ export default function Home() {
               `https://collectionapi.metmuseum.org/public/collection/v1/objects/${objectIDs[0]}`
             );
             const objData = await objRes.json();
-
             results[era] = objData.primaryImageSmall;
           }
         } catch (error) {
@@ -40,22 +47,22 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="bg-black text-yellow-300">
+    <div className="min-h-screen w-full bg-black text-yellow-300 overflow-x-hidden">
 
-      {/* HERO SECTION (Landing merged) */}
+      {/* HERO */}
       <section
-        className="min-h-screen w-full bg-contain flex items-center px-24 font-bold"
+        className="min-h-screen flex items-center bg-cover bg-center px-6 sm:px-10 lg:px-20"
         style={{
           backgroundImage:
             "url('https://images.metmuseum.org/CRDImages/ep/original/DP-14286-001.jpg')",
         }}
       >
         <div className="max-w-3xl">
-          <h1 className="text-6xl md:text-7xl italic text-yellow-200 leading-tight font-ebgaramond">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl italic leading-tight text-yellow-200">
             Explore Art Across Centuries
           </h1>
 
-          <p className="mt-6 text-lg text-yellow-400 italic">
+          <p className="mt-6 text-base sm:text-lg md:text-xl text-yellow-400 italic">
             Take a walk in time and discover history through art.
           </p>
 
@@ -63,7 +70,7 @@ export default function Home() {
             onClick={() =>
               window.scrollTo({ top: window.innerHeight, behavior: "smooth" })
             }
-            className="mt-10 bg-neutral-900 px-8 py-4 rounded-xl text-yellow-400 text-lg hover:bg-neutral-800 transition"
+            className="mt-10 bg-neutral-900 px-6 py-3 sm:px-8 sm:py-4 rounded-xl text-yellow-400 text-base sm:text-lg hover:bg-neutral-800 transition"
           >
             Start Exploring
           </button>
@@ -71,12 +78,12 @@ export default function Home() {
       </section>
 
       {/* FEATURED ERAS */}
-      <section className="px-14 py-24">
-        <h2 className="text-4xl sm:text-xl md:text-2xl lg:text-3xl italic text-yellow-400 mb-12">
+      <section className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-16">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl italic text-yellow-400 mb-12">
           Featured Eras
         </h2>
 
-        <div className="grid md:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {eraList.map((era) => (
             <div
               key={era}
@@ -84,14 +91,14 @@ export default function Home() {
               className="cursor-pointer group"
             >
               <div
-                className="h-96 bg-cover bg-center rounded-xl relative overflow-hidden transform hover:scale-105 transition duration-500"
+                className="aspect-[3/4] bg-cover bg-center rounded-xl relative overflow-hidden transform hover:scale-105 transition duration-500"
                 style={{
                   backgroundImage: `url(${eras[era]})`,
                 }}
               >
                 <div className="absolute inset-0 bg-black/50 group-hover:bg-black/30 transition" />
 
-                <h3 className="absolute bottom-6 left-6 text-yellow-300 italic text-xl">
+                <h3 className="absolute bottom-4 left-4 text-yellow-300 italic text-lg sm:text-xl">
                   {era}
                 </h3>
               </div>

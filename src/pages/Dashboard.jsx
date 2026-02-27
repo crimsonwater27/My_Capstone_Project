@@ -47,38 +47,40 @@ export default function Dashboard() {
 
   return (
     <section
-      className={`space-y-6 min-h-screen w-full overflow-x-hidden bg-[#121212] ${
+      className={`min-h-screen w-full bg-[#121212] overflow-x-hidden ${
         eraThemes[era] || "text-yellow-300"
       } transition-colors duration-500`}
     >
-      {/* Search + Filters */}
-      <div className="space-y-4 px-4 sm:px-6 lg:px-8">
-        <SearchBar />
-        <Filters />
-        <TimelineSlider yearRange={yearRange} setYearRange={setYearRange} />
-      </div>
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8 space-y-8">
 
-      {/* Grid + Sidebar */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start justify-center px-4 sm:px-6 lg:px-8 py-6">
-        {/* Main Panel */}
-        <div className="lg:col-span-3 space-y-6">
-          <h1 className={`text-xl md:text-2xl font-bold ${eraThemes[era] || "text-yellow-300"}`}>
-            {era ? `${era} Artworks` : "Artwork Images"}
-          </h1>
-
-          <Motion.div
-            key={era}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <ArtworkGrid artworks={artworks} />
-          </Motion.div>
+        {/* Search + Filters */}
+        <div className="space-y-4">
+          <SearchBar />
+          <Filters />
+          <TimelineSlider yearRange={yearRange} setYearRange={setYearRange} />
         </div>
 
-        {/* Sidebar */}
-        <div className="lg:col-span-1">
-          <FavoritesPanel />
+        {/* Grid + Sidebar */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Main Panel */}
+          <div className="lg:col-span-3 space-y-6">
+            <h1 className={`text-xl sm:text-2xl md:text-3xl font-bold ${eraThemes[era] || "text-yellow-300"}`}>
+              {era ? `${era} Artworks` : "Artwork Images"}
+            </h1>
+
+            <Motion.div
+              key={era}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <ArtworkGrid artworks={artworks} />
+            </Motion.div>
+          </div>
+
+          <div className="lg:col-span-1">
+            <FavoritesPanel />
+          </div>
         </div>
       </div>
 
