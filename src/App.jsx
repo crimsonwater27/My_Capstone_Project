@@ -11,11 +11,11 @@ import LoginPage from "./pages/LoginPage";
 
 function App() {
   return (
-    <div className="flex flex-col min-h-screen bg-121212 text-white">
+    <div className="flex flex-col min-h-screen bg-121212 text-white w-screen">
       <Header />
 
       <main className="flex-1 w-full">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="w-full min-h-screen px-4 sm:px-6 lg:px-8 py-6">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/favorites" element={<Favorites />} />

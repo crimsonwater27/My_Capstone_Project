@@ -21,21 +21,21 @@ export default function Header() {
           <nav className="flex gap-4 text-sm md:text-base text-yellow-300">
             <Link
               to="/"
-              className="hover:text-yellow-400 transition-colors duration-200"
+              className="hover:text-yellow-400 transition-colors duration-200 font-medium"
             >
               Home
             </Link>
 
             <Link
               to="/dashboard"
-              className="hover:text-yellow-400 transition-colors duration-200"
+              className="hover:text-yellow-400 transition-colors duration-200 font-medium"
             >
               Dashboard
             </Link>
 
             <Link
               to="/favorites"
-              className="hover:text-yellow-400 transition-colors duration-200"
+              className="hover:text-yellow-400 transition-colors duration-200 font-medium"
             >
               Favorites
             </Link>
@@ -43,14 +43,14 @@ export default function Header() {
             {user ? (
               <button
                 onClick={logout}
-                className="text-red-400 hover:text-red-600 transition"
+                className="text-red-400 hover:text-red-600 transition font-medium"
               >
                 Logout
               </button>
             ) : (
               <Link
                 to="/login"
-                className="hover:text-yellow-400 transition"
+                className="hover:text-yellow-400 transition font-medium"
               >
                 Login
               </Link>

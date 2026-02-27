@@ -40,22 +40,22 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="bg-black text-white">
+    <div className="bg-black text-yellow-300">
 
       {/* HERO SECTION (Landing merged) */}
       <section
-        className="h-screen bg-cover bg-center flex items-center px-16"
+        className="min-h-screen w-full bg-contain flex items-center px-24 font-bold"
         style={{
           backgroundImage:
             "url('https://images.metmuseum.org/CRDImages/ep/original/DP-14286-001.jpg')",
         }}
       >
         <div className="max-w-3xl">
-          <h1 className="text-6xl md:text-7xl italic text-yellow-200 leading-tight">
+          <h1 className="text-6xl md:text-7xl italic text-yellow-200 leading-tight font-ebgaramond">
             Explore Art Across Centuries
           </h1>
 
-          <p className="mt-6 text-lg text-yellow-300 italic">
+          <p className="mt-6 text-lg text-yellow-400 italic">
             Take a walk in time and discover history through art.
           </p>
 
@@ -71,8 +71,8 @@ export default function Home() {
       </section>
 
       {/* FEATURED ERAS */}
-      <section className="px-12 py-24">
-        <h2 className="text-4xl italic text-yellow-400 mb-12">
+      <section className="px-14 py-24">
+        <h2 className="text-4xl sm:text-xl md:text-2xl lg:text-3xl italic text-yellow-400 mb-12">
           Featured Eras
         </h2>
 
@@ -84,7 +84,7 @@ export default function Home() {
               className="cursor-pointer group"
             >
               <div
-                className="h-72 bg-cover bg-center rounded-xl relative overflow-hidden transform hover:scale-105 transition duration-500"
+                className="h-96 bg-cover bg-center rounded-xl relative overflow-hidden transform hover:scale-105 transition duration-500"
                 style={{
                   backgroundImage: `url(${eras[era]})`,
                 }}

@@ -127,14 +127,13 @@ export const useArtStore = create((set, get) => ({
     set({ filteredArtworks: filtered });
   },
 
-  // Reset Filters
-  resetFilters: () => {
-    set({
-      selectedEra: null,
-      yearRange: [500, 2025],
-    });
-    get().applyFilters();
-  },
+resetFilters: () => {
+  set({
+    yearRange: [500, 2025],
+  });
+
+  get().applyFilters();
+},
 
   // Artwork Modal
   selectArtwork: async (art) => {

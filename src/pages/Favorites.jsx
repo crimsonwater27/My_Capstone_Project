@@ -14,7 +14,7 @@ export default function FavoritesPage() {
     return (
       <section className="min-h-screen flex items-center justify-center bg-[#121212] text-white">
         <p className="text-lg">
-          You haven’t added any favorites yet.
+          You haven’t added any favorites yet, Your personal Museam awaits!
         </p>
       </section>
     );

@@ -47,7 +47,7 @@ export default function Dashboard() {
 
   return (
     <section
-      className={`space-y-6 min-h-screen bg-[#121212] ${
+      className={`space-y-6 min-h-screen w-full overflow-x-hidden bg-[#121212] ${
         eraThemes[era] || "text-yellow-300"
       } transition-colors duration-500`}
     >
@@ -59,7 +59,7 @@ export default function Dashboard() {
       </div>
 
       {/* Grid + Sidebar */}
-      <div className="grid lg:grid-cols-4 gap-6 items-start justify-center px-4 sm:px-6 lg:px-8 py-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start justify-center px-4 sm:px-6 lg:px-8 py-6">
         {/* Main Panel */}
         <div className="lg:col-span-3 space-y-6">
           <h1 className={`text-xl md:text-2xl font-bold ${eraThemes[era] || "text-yellow-300"}`}>

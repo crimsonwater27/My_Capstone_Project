@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getArtMovement } from "../utils/mapArtMovements";
+import { formatDate } from "../utils/formatDate";
 
 const BASE = "/met/public/collection/v1";
 
@@ -67,7 +68,7 @@ export const fetchArtworksSafe = async (ids, limit = 24) => {
           id: art.objectID,
           title: art.title || "Untitled",
           artist: art.artistDisplayName || "Unknown Artist",
-          date: art.objectDate || "Unknown Date",
+          date: formatDate(art.objectDate),
           movement: getArtMovement(art.objectDate),
           image: art.primaryImageSmall,
         });
